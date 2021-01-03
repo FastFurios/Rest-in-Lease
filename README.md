@@ -75,7 +75,7 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
 * the results should show up as the first row in the table below.
 * Be patient at the first request to the API as AWS Lambda takes a while to start the service. Subsequent calls are responded quickly.
 Remark:
-* CORS is enabled in the GET request as the request to the AWS API goes to another domain then the the domain the webpage came from (=localhost). It is important that CORS is set in the API Gateway as described above.  
+* CORS is enabled in the GET request as the request to the AWS API goes to another domain then the domain the webpage came from (i.e. localhost). It is important that the CORS parameters are set in the API Gateway as described above. API Gateway will return the right http headers, e.g. Access-Control-Allow-Origin=* , indicating that API requests from a webpage loaded into the browser from localhost or from any other domain are OK. 
 
 
 

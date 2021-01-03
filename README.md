@@ -1,6 +1,5 @@
 # Rest-in-Lease
-Sample REST-Service written in Clojure and implemented on AWS Lamda and AWS API Gateway. 
-
+Sample REST-Service written in Clojure and implemented on AWS Lamda and AWS API Gateway (Dez 2020).
 ## What it does
 The Lambda service is written in Clojure and it takes 6 parameters as inputs n the GET request, such as 
 ```
@@ -54,7 +53,7 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
 * Check if upload was successful by refreshing the Lambda functions list in the AWS Lambda console
 * Then continue with the steps in AWS Gateway, see below.
 
-### AWS API Gateway
+## AWS API Gateway
 * if none yet existent, create a new API Gateway: 
   * protocol = http
   * Deploy / Stages: create a "Test" stage with Automatic Deployment disabled
@@ -64,7 +63,7 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
  * When new version of the Lambda function was deployed:
    * Integrations: Manage Integrations: edit / save (to bind the newly deployed Lambda function to this API route) and deploy to stage "Test".
  
- ### AWS CloudWatch
+ ## AWS CloudWatch
  * For Lambda functions AWS logs into CloudWatch by default, see also:  Lambda > Functions > rest-in-lease-api-aws > Edit monitoring tools
  * For API Gateways logging has to be activated explicitely, see above.
  * To check logs: look under Log Groups for the ones setup for the AWS API Gateway and the AWS Lambda function 

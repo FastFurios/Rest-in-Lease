@@ -30,10 +30,21 @@ This little sample application consists of 3 elements:
 * (optional) the website to demo it 
 
 ### AWS Lambda service
-The service itself is written in Cojure. Special remarks:
+The service itself is written in Clojure. 
+Special remarks:
 * once compiled into a jar-file with class-files, the JVM sees a module.class "rest_in_lease_api_aws.core" with a static method "handler" which is be called by AWS Gateway (see below)
 * the Clojure service does not make use of Clojure's ring-framework. There was just no need at the end. The job could be done with closure.data.json only.
 * the current implemented version processes a GET request that ontains the inputs in the query string. The version that processes POST requests with JSON as input is commented out. 
 * the request passed to "handler" is a Clojure map with the query-string key-value-pairs as strings. 
 * the service creates a Clojure map and returns it to the calling API Gateway. The conversion from the JSON message from API Gateway into a Clojure map and visa versa  is done magically automatically. When using the POST method (code is commented out at the moment), the "body" in the input JSON from API Gateway is a string, containing the actual JSON with the leasing input parameters. This string needs to be converted into a Clojure map explicitely by json/read-string.   
+
+Build:
+```
+project-folder$ lein uberjar
+```
+Deploy:
+```
+project-folder$ aws lambda create-function   --function-name rest-in-lease-api-aws   --handler rest_in_lease_api_aws.core::handler   --runtime java8   --memory 512   --timeout 10    --zip-file fileb://./target/uberjar/rest-in-lease-api-aws-0.1.0-SNAPSHOT-standalone.jar  --role arn:aws:iam::545854326725:role/service-role/aws-lambda-03-recv-ret-json-2-log-role-cbh95yyk
+```
+
 

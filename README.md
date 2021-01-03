@@ -55,6 +55,6 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
 
 ### AWS API Gateway
 * if none yet create a new API Gateway: 
-** protocoll=http 
+ * protocoll=http 
 
 

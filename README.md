@@ -55,6 +55,11 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
 
 ### AWS API Gateway
 * if none yet create a new API Gateway: 
- * protocoll=http 
+ * protocol = http
+ * Deploy / Stages: create a "Test" stage with Automatic Deployment disabled
+ * Develop / Routes: set REST end-point path = /calc-profit, add GET route with an in Integration to a Lambda service, select the Lambda service "rest-in-lease-api-aws", set Payload Format Version to 2.0 and Grant API Gateway permission to invoke your Lambda function.
+ 
+ 
+ 
 
 

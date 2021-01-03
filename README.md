@@ -1,5 +1,5 @@
 # Rest-in-Lease
-Sample REST-Service written in Clojure and implemented on AWS Lamda and AWS Gateway. 
+Sample REST-Service written in Clojure and implemented on AWS Lamda and AWS API Gateway. 
 
 ## What it does
 The Lambda service is written in Clojure and it takes 6 parameters as inputs n the GET request, such as 
@@ -26,7 +26,7 @@ Also, there is a simple website index.html in the clojure project's src folder. 
 ## How it is implememted
 This little sample application consists of 3 elements: 
 * the AWS Lambda service
-* the AWS Gateway configuration
+* the AWS API Gateway configuration
 * (optional) the website to demo it 
 
 ### AWS Lambda service
@@ -50,5 +50,11 @@ Deploy:
 ```
 project-folder$ aws lambda create-function   --function-name rest-in-lease-api-aws   --handler rest_in_lease_api_aws.core::handler   --runtime java8   --memory 512   --timeout 10    --zip-file fileb://./target/uberjar/rest-in-lease-api-aws-0.1.0-SNAPSHOT-standalone.jar  --role arn:aws:iam::545854326725:role/service-role/aws-lambda-03-recv-ret-json-2-log-role-cbh95yyk
 ```
+* Check if upload was successful by refreshing the Lambda functions list in the AWS Lambda console
+* Then continue with the steps in AWS Gateway, see below.
+
+### AWS API Gateway
+* if none yet create a new API Gateway: 
+** protocoll=http 
 
 

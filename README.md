@@ -29,4 +29,11 @@ This little sample application consists of 3 elements:
 * the AWS Gateway configuration
 * (optional) the website to demo it 
 
+### AWS Lambda service
+The service itself is written in Cojure. Special remarks:
+* once compiled into a jar-file with class-files, the JVM sees a module.class "rest_in_lease_api_aws.core" with a static method "handler" which is be called by AWS Gateway (see below)
+* the Clojure service does not make use of Clojure's ring-framework. There was just no need at the end. The job could be done with closure.data.json only.
+* the current implemented version processes a GET request that ontains the inputs in the query string. The version that processes POST requests with JSON as input is commented out. 
+* the request passed to "handler" is a Clojure map with the query-string key-value-pairs as strings. 
+* the service creates a Clojure map and returns it to the calling API Gateway. The conversion from the JSON message from API Gateway into a Clojure map and visa versa  is done magically automatically. When using the POST method (code is commented out at the moment), the "body" in the input JSON from API Gateway is a string, containing the actual JSON with the leasing input parameters. This string needs to be converted into a Clojure map explicitely by json/read-string.   
 

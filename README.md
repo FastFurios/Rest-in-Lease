@@ -43,6 +43,11 @@ Build:
 project-folder$ lein uberjar
 ```
 Deploy:
+Logon to: 
+https://aws.amazon.com/de/
+Go to: MyAccount / AWS Management Console / Lambda
+Delete the AWS Lambda service
+Then deploy the uberjar to AWS Lambda:
 ```
 project-folder$ aws lambda create-function   --function-name rest-in-lease-api-aws   --handler rest_in_lease_api_aws.core::handler   --runtime java8   --memory 512   --timeout 10    --zip-file fileb://./target/uberjar/rest-in-lease-api-aws-0.1.0-SNAPSHOT-standalone.jar  --role arn:aws:iam::545854326725:role/service-role/aws-lambda-03-recv-ret-json-2-log-role-cbh95yyk
 ```

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+<!--
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+-->
+    <script>
+
+        function displayContractResults(parentElem, conRes, numLeasePeriods, purchasePrice, deprecRateYrly, refiInterestRateYrly, refiAnnuity, leaseRate) {
+            var table = document.getElementById("ContractsCalculations");
+            var row = table.insertRow(1);
+            row.insertCell(00).innerHTML = numLeasePeriods;
+            row.insertCell(01).innerHTML = purchasePrice;
+            row.insertCell(02).innerHTML = deprecRateYrly;
+            row.insertCell(03).innerHTML = refiInterestRateYrly;
+            row.insertCell(04).innerHTML = refiAnnuity;
+            row.insertCell(05).innerHTML = leaseRate;
+            row.insertCell(06).innerHTML = "=>";
+            row.insertCell(07).innerHTML = conRes.remaining_value;
+            row.insertCell(08).innerHTML = conRes.amortization_periods;
+            row.insertCell(09).innerHTML = conRes.paid_amortization;
+            row.insertCell(10).innerHTML = conRes.paid_interest;
+            row.insertCell(11).innerHTML = conRes.contract_profit;
+        }
+
+        function calcProfit(apiUrl, init, numLeasePeriods, purchasePrice, deprecRateYrly, refiInterestRateYrly, refiAnnuity, leaseRate) {
+            api = apiUrl + '?'
+                + 'numLeasePeriods=' + numLeasePeriods
+                + '&purchasePrice=' + purchasePrice
+                + '&deprecRateYrly=' + deprecRateYrly
+                + '&refiInterestRateYrly=' + refiInterestRateYrly
+                + '&refiAnnuity=' + refiAnnuity
+                + '&leaseRate=' + leaseRate
+
+            console.log('listMovies: api = ' + api);
+            console.log('listMovies: init.mode = ' + init.mode);
+            console.log('listMovies: init.headers.get(\'Content-Type\') = ' + init.headers.get('Content-Type'));
+            console.log('listMovies: init.headers.get(\'Origin\') = ' + init.headers.get('Origin'));
+
+            fetch(api, init)
+            .then(res =>   { return res.json() }) 
+//          .then(results => console.log('Contract Profit = ' + results.contract_profit)) 
+            .then(results => displayContractResults(document.getElementById('ContractsCalculations'), 
+                    results, numLeasePeriods, purchasePrice, deprecRateYrly, refiInterestRateYrly, refiAnnuity, leaseRate))
+
+        }
+    </script>
+
+</head>
+<body>
+    <h1>This is a page that demonstrates the use of the "Rest in Lease" API!</h1>
+    <small>This website calls an AWS API with an Lambda function written in Clojure connected to it which does the leasing contract calculations.</small>
+    <br>
+    <br>
+
+    <form>
+        <fieldset>
+            <legend>Vertragsdaten</legend>
+            <p> <label>Laufzeit in Monaten: </label> <input type = "number" id = "numLeasePeriods" value = 36 /></p>
+            <p> <label>Kaufpreis : </label> <input type = "number" id = "purchasePrice" value = 30000 /></p>
+            <p> <label>Abschreibung pro Jahr (Werte 0-1): </label> <input type = "number" id = "deprecRateYrly" value = 0.15 /></p>
+            <p> <label>ReFi Zinssatz (Werte 0-1): </label> <input type = "number" id = "refiInterestRateYrly" value = 0.03 /></p>
+            <p> <label>Annuität: </label> <input type = "number" id = "refiAnnuity" value = 1000 /></p>
+            <p> <label>Leasingrate: </label> <input type = "number" id = "leaseRate" value = 400 /></p>
+            <button type="button" 
+                onclick="calcProfit(
+                    apiUrl, 
+                    myInit,
+                    document.getElementById('numLeasePeriods').value, 
+                    document.getElementById('purchasePrice').value,
+                    document.getElementById('deprecRateYrly').value,
+                    document.getElementById('refiInterestRateYrly').value,
+                    document.getElementById('refiAnnuity').value,
+                    document.getElementById('leaseRate').value
+                    ); 
+                "> 
+                Deckungsbeitrag Vertrag 
+            </button>
+        </fieldset>
+    </form>
+    <br><br>
+    <strong>Kalkulationen für Leasingverträge: </strong> 
+
+    <!-- here will be a rows added for each movie that came with the API response-->
+    <table id="ContractsCalculations" border="1" >
+        <tr><th>LZ Monate</th><th>Kaufpreis</th><th>Abschreibung</th><th>ReFi-Zinssatz</th><th>Annuität</th><th>Leasingrate</th>
+            <th>=></th><th>Restwert</th><th>Tilgungsdauer</th><th>Tilgung</th><th>Zinsen</th><th>Deckungsbeitrag</th></tr>
+      <!-- here will be a rows added for each movie that came with the API response-->
+    </table>
+
+    <script>
+/*
+        When making requests to an AWS API, make sure the CORS settings for the API is set correctly:
+        AWS API / CORS: 
+            Access-Control-Allow-Origin = *  or http://localhost
+            Access-Control-Allow-Headers = *
+            Access-Control-Allow-Methods = *
+            Access-Control-Expose-Headers = leave unchanged (= No Expose Headers are allowed)
+            Access-Control-Max-Age = e.g. 1000 Seconds
+            Access-Control-Allow-Credentials = leave unchanged (= NO)
+*/
+
+        const apiUrl = 'https://3xhwkqfrmd.execute-api.us-east-2.amazonaws.com/Test/calc-profit'
+
+        var myHeaders = new Headers();
+        myHeaders.append('Origin', 'https://technology.lindorfer.com'    );
+        myHeaders.append('Content-Type'                 , 'application/x-www-form-urlencoded'  );
+        myHeaders.append('Access-Control-Allow-Origin'  , '*'           );
+        myHeaders.append('Access-Control-Request-Method', 'GET'         );
+
+        var myInit = {
+            method: 'GET',
+            headers: myHeaders,
+            mode: 'cors',
+            cache: 'default'
+        };
+    </script>
+<br><br>
+<small>(G.Lindorfer 2020-12)</small>
+</body>
+</html>

@@ -1,0 +1,89 @@
+(ns learn-clojure.core
+  (:require 
+    [clojure.string :as str]
+  )
+  (:gen-class)
+)
+
+
+;; ---- helper functions ----
+(defn sumUpList [l] (if (empty? l) 0 (+ (first l) (sumUpList (rest l) ))))
+(defn sumUpVecElemInCashFlow [elem ail] (reduce + (map (fn[amortInterestVec] (elem amortInterestVec)) ail)))
+
+(defn PadListRight [listToBePadded elem num]
+    (defn createExtension [elem num] (if (<= num 0) nil (list* elem (createExtension elem (dec num)))))
+    (concat listToBePadded (createExtension elem num))        
+)
+
+;; ---- leasing core  functions ----
+(defn DeprecCashFlowListForPeriods [deprecRate remLeasePeriods remValue]
+    (if (zero? remLeasePeriods) 
+        nil 
+        (let [deprecOfPeriod (* remValue deprecRate)]
+            (list* deprecOfPeriod (DeprecCashFlowListForPeriods deprecRate (dec remLeasePeriods) (- remValue deprecOfPeriod)))
+        )
+    )
+)
+
+(defn AmortAndInterestCashFlowList [intRate annuity remDebt] ; returns a list of tuples ([amort interest] ...)
+    (let [interest (* remDebt intRate)
+          amort (min remDebt (- annuity interest))
+         ]
+        (if (>= interest annuity) ; will never end: refactor to exception raising 
+            nil
+        )                
+        (if (> remDebt 0) 
+            (list* [amort interest] (AmortAndInterestCashFlowList intRate annuity (- remDebt amort)))
+            nil
+        )
+     )
+)
+
+(defn NetCashFlowList [leaseRate period remValue a&iCfList]
+
+    (if (= (count a&iCfList) 0)
+        nil
+;       (do     (prn "#P=" period "a&iCfList.nil?=" (nil? a&iCfList) "a&iCfList.count=" (count a&iCfList) "a&iCfList.first=" (first a&iCfList))
+        (list* 
+              (- 
+                  (cond
+                    (pos? period)   leaseRate
+                    (zero? period)  remValue ; sell the asset
+                    :else           0
+                  )
+                  (first (first a&iCfList)) 
+                  (last  (first a&iCfList))
+              )
+              (NetCashFlowList leaseRate (dec period) remValue (rest a&iCfList))
+        )
+;       ) ; do
+    )
+)
+
+
+(defn contractProfit [numLeasePeriods leaseRate deprecRate purchasePrice refiInterestRate refiAnnuity]
+    (def deprecCashFlowList (DeprecCashFlowListForPeriods deprecRate numLeasePeriods purchasePrice))
+    (def remValue (- purchasePrice (sumUpList deprecCashFlowList)))
+    (prn "remValue=" (- purchasePrice (sumUpList deprecCashFlowList)))
+    (def amortAndInterestCashFlowList (AmortAndInterestCashFlowList refiInterestRate refiAnnuity remValue))  ; => ([amort interest] ...)
+    (def amortAndInterestCashFlowListExt (PadListRight amortAndInterestCashFlowList [0 0] (+ (- numLeasePeriods (count amortAndInterestCashFlowList)) 1)))
+
+    (def netCashFlowList (NetCashFlowList leaseRate numLeasePeriods remValue amortAndInterestCashFlowListExt))    
+    
+    (hash-map   
+                "paid amortization"       (Math/round (sumUpVecElemInCashFlow first amortAndInterestCashFlowList))
+                "paid interest"           (Math/round (sumUpVecElemInCashFlow last amortAndInterestCashFlowList))
+                "remaining value"         (Math/round remValue) 
+                "contract profit"         (Math/round (sumUpList netCashFlowList)) 
+    )
+)
+
+
+(def deprecRate (/ 0.2 12))
+(def numLeasePeriods 36)
+(def purchasePrice 30000)
+(def refiInterestRate (/ 0.05 12))
+(def refiAnnuity 1000)
+(def leaseRate 800)
+
+(contractProfit numLeasePeriods leaseRate deprecRate purchasePrice refiInterestRate refiAnnuity)

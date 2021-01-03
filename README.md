@@ -21,13 +21,14 @@ The service can be called via URL entered in a web browser, via Postmann or from
 $ curl --location --request GET 'https://3xhwkqfrmd.execute-api.us-east-2.amazonaws.com/Test/calc-profit?numLeasePeriods=36&leaseRate=400&deprecRateYrly=0.15&purchasePrice=30000&refiInterestRateYrly=0.03&refiAnnuity=1000'
 ```
 
-Also, there is a simple website index.html in the clojure project's src folder. When called from a local webserver (e.g. MiniWebserver etc.) inputs can be entered and results from the Rest-in-Lease Lambda service are displayed.
+Also, there is a simple webpage index.html in the clojure project's src folder. When called from a local webserver (e.g. MiniWebserver etc.) inputs can be entered and results from the Rest-in-Lease Lambda service are displayed.
 
 ## How it is implememted
-This little sample application consists of 3 elements: 
+This little sample application consists of the following elements: 
 * the AWS Lambda service
 * the AWS API Gateway configuration
-* (optional) the website to demo it 
+* (optional) AWS CloudWatch
+* (optional) the webpage to demo it 
 
 ### AWS Lambda service
 The service itself is written in Clojure. 
@@ -58,10 +59,16 @@ project-folder$ aws lambda create-function   --function-name rest-in-lease-api-a
   * protocol = http
   * Deploy / Stages: create a "Test" stage with Automatic Deployment disabled
   * Develop / Routes: set REST end-point path = /calc-profit, add GET route with an in Integration to a Lambda service, select the Lambda service "rest-in-lease-api-aws", set Payload Format Version to 2.0 and Grant API Gateway permission to invoke your Lambda function.
-  * CORS: Access-Control-Allow-Origin = * , Access-Control-Allow-Headers = * , Access-Control-Allow-Methods = *  
+  * CORS: Access-Control-Allow-Origin = * , Access-Control-Allow-Headers = * , Access-Control-Allow-Methods = *
+  * Logging: to AWS CloudWatch can be set up, e.g. with log desination "arn:aws:logs:us-east-2:545854326725:log-group:rest-in-lease-aws-api" 
  * When new version of the Lambda function was deployed:
    * Integrations: Manage Integrations: edit / save (to bind the newly deployed Lambda function to this API route) and deploy to stage "Test".
  
- 
+ ### AWS CloudWatch
+ * For Lambda functions AWS logs into CloudWatch by default, see also:  Lambda > Functions > rest-in-lease-api-aws > Edit monitoring tools
+ * For API Gateways logging has to be activated explicitely, see above.
+ * To check logs: look under Log Groups for the ones setup for the AWS API Gateway and the AWS Lambda function 
+
+### The webpage
 
 

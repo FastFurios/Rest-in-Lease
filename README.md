@@ -1,7 +1,7 @@
 # Rest-in-Lease
 Sample REST-Service written in Clojure and implemented on AWS Lamda and AWS API Gateway (Dez 2020).
 ## What it does
-The Lambda service is written in Clojure and it takes 6 parameters as inputs n the GET request, such as 
+The Lambda service is written in Clojure and it takes 6 parameters as inputs in the GET request, such as 
 ```
 https://3xhwkqfrmd.execute-api.us-east-2.amazonaws.com/Test/calc-profit?numLeasePeriods=36&leaseRate=400&deprecRateYrly=0.15&purchasePrice=30000&refiInterestRateYrly=0.03&refiAnnuity=1000
 ```
